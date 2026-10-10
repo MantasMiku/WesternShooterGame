@@ -1,0 +1,38 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Weapons/dynamite_projectile.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://Scenes/Weapons/dynamite_viewmodel.tscn" id="2_model"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_bounce"]
+friction = 1.0
+rough = true
+bounce = 0.12
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_body"]
+size = Vector3(0.16, 0.32, 0.16)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_hit"]
+radius = 0.45
+
+[node name="DynamiteProjectile" type="RigidBody3D"]
+collision_layer = 0
+collision_mask = 1
+mass = 0.5
+physics_material_override = SubResource("PhysicsMaterial_bounce")
+continuous_cd = true
+linear_damp = 0.3
+angular_damp = 2.0
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_body")
+
+[node name="Model" parent="." instance=ExtResource("2_model")]
+
+[node name="HitArea" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HitArea"]
+shape = SubResource("SphereShape3D_hit")

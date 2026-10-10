@@ -1,0 +1,86 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://fqo4dum6ink7" path="res://Scenes/Player/player_controller.tscn" id="1_base"]
+[ext_resource type="Script" path="res://Scenes/Gunslinger/gunslinger.gd" id="2_gunslinger"]
+[ext_resource type="Script" uid="uid://cnpbql5eaqyor" path="res://Scripts/Weapons/weapon_manager.gd" id="3_wm"]
+[ext_resource type="Script" uid="uid://b2jfsomw176sx" path="res://Scripts/Weapons/hitscan_weapon.gd" id="4_hitscan"]
+[ext_resource type="Script" uid="uid://mvau4j4fhbnl" path="res://Scripts/Weapons/melee_weapon.gd" id="5_melee"]
+[ext_resource type="Script" path="res://Scripts/Weapons/dual_pistol_weapon.gd" id="6_dual"]
+[ext_resource type="PackedScene" path="res://Scenes/Weapons/dual_revolvers_viewmodel.tscn" id="7_dual_vm"]
+[ext_resource type="PackedScene" path="res://Scenes/Weapons/coach_gun_viewmodel.tscn" id="8_coach_vm"]
+[ext_resource type="PackedScene" path="res://Scenes/Weapons/bowie_knife_viewmodel.tscn" id="9_knife_vm"]
+
+[node name="Gunslinger" instance=ExtResource("1_base")]
+script = ExtResource("2_gunslinger")
+max_health = 125
+walk_speed = 8.2
+sprint_speed = 10.0
+
+[node name="DualRevolversViewmodel" parent="HeadOriginalPosition/Head/CameraSmooth/Camera3D" instance=ExtResource("7_dual_vm")]
+visible = false
+
+[node name="CoachGunViewmodel" parent="HeadOriginalPosition/Head/CameraSmooth/Camera3D" instance=ExtResource("8_coach_vm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.34, -0.34, -0.42)
+visible = false
+
+[node name="BowieKnifeViewmodel" parent="HeadOriginalPosition/Head/CameraSmooth/Camera3D" instance=ExtResource("9_knife_vm")]
+transform = Transform3D(0.984808, 0, 0.173648, 0, 1, 0, -0.173648, 0, 0.984808, 0.3, -0.3, -0.45)
+visible = false
+
+[node name="WeaponManager" type="Node" parent="."]
+script = ExtResource("3_wm")
+
+[node name="DualRevolvers" type="Node" parent="WeaponManager" node_paths=PackedStringArray("right_gun", "left_gun", "right_flash", "left_flash", "viewmodel")]
+script = ExtResource("6_dual")
+right_gun = NodePath("../../HeadOriginalPosition/Head/CameraSmooth/Camera3D/DualRevolversViewmodel/Right")
+left_gun = NodePath("../../HeadOriginalPosition/Head/CameraSmooth/Camera3D/DualRevolversViewmodel/Left")
+right_flash = NodePath("../../HeadOriginalPosition/Head/CameraSmooth/Camera3D/DualRevolversViewmodel/Right/MuzzleFlash")
+left_flash = NodePath("../../HeadOriginalPosition/Head/CameraSmooth/Camera3D/DualRevolversViewmodel/Left/MuzzleFlash")
+damage_per_pellet = 18
+pellet_count = 1
+spread_degrees = 1.3
+max_range = 70.0
+falloff_start = 10.0
+falloff_end = 30.0
+min_damage_multiplier = 0.5
+mag_size = 12
+reserve_ammo = 48
+reload_time = 1.6
+recoil_kick = 0.07
+recoil_pitch_degrees = 24.0
+view_punch_degrees = 1.0
+weapon_name = "Dual revolvers"
+viewmodel = NodePath("../../HeadOriginalPosition/Head/CameraSmooth/Camera3D/DualRevolversViewmodel")
+fire_cooldown = 0.14
+automatic = true
+
+[node name="CoachGun" type="Node" parent="WeaponManager" node_paths=PackedStringArray("muzzle_flash", "viewmodel")]
+script = ExtResource("4_hitscan")
+damage_per_pellet = 7
+pellet_count = 10
+spread_degrees = 7.0
+max_range = 40.0
+falloff_start = 4.0
+falloff_end = 15.0
+min_damage_multiplier = 0.25
+headshot_multiplier = 1.0
+mag_size = 2
+reserve_ammo = 24
+reload_time = 1.6
+muzzle_flash = NodePath("../../HeadOriginalPosition/Head/CameraSmooth/Camera3D/CoachGunViewmodel/MuzzleFlash")
+recoil_kick = 0.14
+recoil_pitch_degrees = 16.0
+view_punch_degrees = 3.0
+weapon_name = "Coach gun"
+viewmodel = NodePath("../../HeadOriginalPosition/Head/CameraSmooth/Camera3D/CoachGunViewmodel")
+fire_cooldown = 0.3
+
+[node name="BowieKnife" type="Node" parent="WeaponManager" node_paths=PackedStringArray("viewmodel")]
+script = ExtResource("5_melee")
+damage = 45
+melee_range = 2.0
+swing_style = 0
+swing_time = 0.25
+weapon_name = "Bowie knife"
+viewmodel = NodePath("../../HeadOriginalPosition/Head/CameraSmooth/Camera3D/BowieKnifeViewmodel")
+fire_cooldown = 0.5

@@ -1,0 +1,14 @@
+[remap]
+
+importer="func_godot.palette"
+type="Resource"
+uid="uid://p4a2g2a4mq22"
+path="res://.godot/imported/f3_end.lmp-b55c6930b207f6871917db1aca4bd2b4.tres"
+
+[deps]
+
+source_file="res://TrenchBrooms/textures/f3_end.lmp"
+dest_files=["res://.godot/imported/f3_end.lmp-b55c6930b207f6871917db1aca4bd2b4.tres"]
+
+[params]
+

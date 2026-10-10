@@ -1,0 +1,9 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://models/WeaponModels/Melees/Bat.fbx" id="1_fbx"]
+
+[node name="BatViewmodel" instance=ExtResource("1_fbx")]
+
+[node name="Batte" parent="." index="0"]
+transform = Transform3D(42.6, 0, 0, 0, 0, 42.6, 0, -42.6, 0, 0, 0, 0)
+cast_shadow = 0

@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://models/WeaponModels/Explosives/Dynamite.fbx" id="1_fbx"]
+
+[sub_resource type="Gradient" id="Gradient_spark"]
+colors = PackedColorArray(1, 0.95, 0.6, 1, 1, 0.45, 0.1, 0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spark"]
+shading_mode = 0
+vertex_color_use_as_albedo = true
+transparency = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_spark"]
+material = SubResource("StandardMaterial3D_spark")
+radius = 0.012
+height = 0.024
+radial_segments = 4
+rings = 2
+
+[node name="DynamiteViewmodel" instance=ExtResource("1_fbx")]
+
+[node name="Cube_007" parent="." index="0"]
+transform = Transform3D(5, 0, 0, 0, 0, 7, 0, -5, 0, 0.0256, -0.0368, -0.002)
+cast_shadow = 0
+
+[node name="FuseSparks" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19, 0)
+amount = 14
+lifetime = 0.3
+local_coords = true
+mesh = SubResource("SphereMesh_spark")
+direction = Vector3(0, 1, 0)
+spread = 70.0
+initial_velocity_min = 0.8
+initial_velocity_max = 2.2
+gravity = Vector3(0, -5, 0)
+color_ramp = SubResource("Gradient_spark")

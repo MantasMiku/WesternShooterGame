@@ -1,0 +1,14 @@
+[remap]
+
+importer="func_godot.map"
+type="Resource"
+uid="uid://dg2nuu8sm74tf"
+path="res://.godot/imported/multiplayer_test_map.map-489725c7944230e5eec32dcb4de09478.tres"
+
+[deps]
+
+source_file="res://TrenchBrooms/maps/multiplayer_test_map.map"
+dest_files=["res://.godot/imported/multiplayer_test_map.map-489725c7944230e5eec32dcb4de09478.tres"]
+
+[params]
+

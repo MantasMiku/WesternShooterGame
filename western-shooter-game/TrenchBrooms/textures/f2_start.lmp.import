@@ -1,0 +1,14 @@
+[remap]
+
+importer="func_godot.palette"
+type="Resource"
+uid="uid://dwa7dvbtllh28"
+path="res://.godot/imported/f2_start.lmp-2ef5d953909ce3f1a14624ae94c906c6.tres"
+
+[deps]
+
+source_file="res://TrenchBrooms/textures/f2_start.lmp"
+dest_files=["res://.godot/imported/f2_start.lmp-2ef5d953909ce3f1a14624ae94c906c6.tres"]
+
+[params]
+

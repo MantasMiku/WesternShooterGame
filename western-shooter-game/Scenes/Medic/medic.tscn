@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://oquoy2vrx624"]
+
+[ext_resource type="PackedScene" uid="uid://fqo4dum6ink7" path="res://Scenes/Player/player_controller.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://du3733wfko4a4" path="res://Scenes/Medic/medic.gd" id="2_medic"]
+[ext_resource type="Script" uid="uid://cnpbql5eaqyor" path="res://Scripts/Weapons/weapon_manager.gd" id="3_wm"]
+[ext_resource type="Script" uid="uid://b2jfsomw176sx" path="res://Scripts/Weapons/hitscan_weapon.gd" id="4_hitscan"]
+[ext_resource type="Script" uid="uid://co5jloldvl3wk" path="res://Scripts/Weapons/syringe_weapon.gd" id="5_syringe"]
+[ext_resource type="PackedScene" path="res://Scenes/Weapons/syringe_viewmodel.tscn" id="6_syr_vm"]
+[ext_resource type="Script" uid="uid://mvau4j4fhbnl" path="res://Scripts/Weapons/melee_weapon.gd" id="7_melee"]
+[ext_resource type="PackedScene" path="res://Scenes/Weapons/hunter_shotgun_viewmodel.tscn" id="8_shotgun_vm"]
+[ext_resource type="PackedScene" path="res://Scenes/Weapons/bone_saw_viewmodel.tscn" id="9_saw_vm"]
+
+[node name="Medic" unique_id=511222390 instance=ExtResource("1_base")]
+script = ExtResource("2_medic")
+regen_delay = 4.0
+regen_interval = 1.0
+regen_amount = 3
+max_health = 150
+
+[node name="Pump-Shotgun-Long" parent="HeadOriginalPosition/Head/CameraSmooth/Camera3D" parent_id_path=PackedInt32Array(1627890197) index="0" unique_id=869992579]
+visible = false
+
+[node name="HunterShotgunViewmodel" parent="HeadOriginalPosition/Head/CameraSmooth/Camera3D" parent_id_path=PackedInt32Array(1627890197) index="2" unique_id=1204565506 instance=ExtResource("8_shotgun_vm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.42, -0.42, -0.5)
+visible = false
+
+[node name="SyringeViewmodel" parent="HeadOriginalPosition/Head/CameraSmooth/Camera3D" parent_id_path=PackedInt32Array(1627890197) index="3" unique_id=1972316696 instance=ExtResource("6_syr_vm")]
+transform = Transform3D(1.96962, 0.0242262, 0.34645, 0, 1.99513, -0.139513, -0.347296, 0.137393, 1.96482, 0.32, -0.3, -0.45)
+visible = false
+
+[node name="BoneSawViewmodel" parent="HeadOriginalPosition/Head/CameraSmooth/Camera3D" parent_id_path=PackedInt32Array(1627890197) index="4" unique_id=458453779 instance=ExtResource("9_saw_vm")]
+transform = Transform3D(0.965926, -0.258819, 0, 0.212012, 0.79124, 0.573576, -0.148453, -0.554032, 0.819152, 0.38, -0.5, -0.55)
+visible = false
+
+[node name="WeaponManager" type="Node" parent="." index="7" unique_id=551742901]
+script = ExtResource("3_wm")
+
+[node name="Shotgun" type="Node" parent="WeaponManager" index="0" unique_id=39801721 node_paths=PackedStringArray("muzzle_flash", "viewmodel")]
+script = ExtResource("4_hitscan")
+headshot_multiplier = 1.0
+view_punch_degrees = 2.5
+muzzle_flash = NodePath("../../HeadOriginalPosition/Head/CameraSmooth/Camera3D/HunterShotgunViewmodel/MuzzleFlash")
+weapon_name = "Remington 1889"
+viewmodel = NodePath("../../HeadOriginalPosition/Head/CameraSmooth/Camera3D/HunterShotgunViewmodel")
+fire_cooldown = 0.35
+
+[node name="Syringe" type="Node" parent="WeaponManager" index="1" unique_id=551004901 node_paths=PackedStringArray("viewmodel")]
+script = ExtResource("5_syringe")
+heal_amount = 25
+weapon_name = "Syringe"
+viewmodel = NodePath("../../HeadOriginalPosition/Head/CameraSmooth/Camera3D/SyringeViewmodel")
+fire_cooldown = 0.6
+
+[node name="BoneSaw" type="Node" parent="WeaponManager" index="2" unique_id=1755793760 node_paths=PackedStringArray("viewmodel")]
+script = ExtResource("7_melee")
+swing_time = 0.35
+weapon_name = "Bone Saw"
+viewmodel = NodePath("../../HeadOriginalPosition/Head/CameraSmooth/Camera3D/BoneSawViewmodel")
+fire_cooldown = 0.8

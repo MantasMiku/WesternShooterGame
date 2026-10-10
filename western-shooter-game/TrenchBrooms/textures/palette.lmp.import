@@ -1,0 +1,14 @@
+[remap]
+
+importer="func_godot.palette"
+type="Resource"
+uid="uid://jugsx5j1xygv"
+path="res://.godot/imported/palette.lmp-39076605cfefecaf61a521a900a6172e.tres"
+
+[deps]
+
+source_file="res://TrenchBrooms/textures/palette.lmp"
+dest_files=["res://.godot/imported/palette.lmp-39076605cfefecaf61a521a900a6172e.tres"]
+
+[params]
+

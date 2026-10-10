@@ -1,0 +1,49 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://models/WeaponModels/Shotgun/Hunter-Shotgun-Complete.fbx" id="1_fbx"]
+[ext_resource type="Texture2D" uid="uid://cd18rluk47tcu" path="res://Assets/Particles/PNG (Transparent)/star_06.png" id="2_star"]
+
+[sub_resource type="Gradient" id="Gradient_flash"]
+offsets = PackedFloat32Array(0, 0.17391305, 1)
+colors = PackedColorArray(0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_flash"]
+gradient = SubResource("Gradient_flash")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_flash"]
+angle_min = 45.0
+angle_max = 45.0
+gravity = Vector3(0, 0, 0)
+color_ramp = SubResource("GradientTexture1D_flash")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_flash"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(1, 1, 0.7411765, 1)
+albedo_texture = ExtResource("2_star")
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_flash"]
+material = SubResource("StandardMaterial3D_flash")
+size = Vector2(0.5, 0.5)
+orientation = 2
+
+[node name="HunterShotgunViewmodel" instance=ExtResource("1_fbx")]
+
+[node name="Shotgun_C_001" parent="." index="0"]
+transform = Transform3D(0, -20, 0, 0, 0, 20, -20, 0, 0, 0, 0, 0)
+cast_shadow = 0
+
+[node name="MuzzleFlash" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, -1.05)
+emitting = false
+amount = 1
+lifetime = 0.25
+one_shot = true
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_flash")
+draw_pass_1 = SubResource("PlaneMesh_flash")

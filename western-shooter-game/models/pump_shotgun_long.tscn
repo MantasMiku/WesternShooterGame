@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://cuh0qboeuaq5x"]
+
+[ext_resource type="PackedScene" uid="uid://dv4m6ipead4wc" path="res://models/Pump-Shotgun-Long.fbx" id="1_1hafc"]
+
+[node name="Pump-Shotgun-Long" unique_id=869992579 instance=ExtResource("1_1hafc")]
+
+[node name="Shotgun_B" parent="." index="0" unique_id=2043619660]
+transform = Transform3D(1.6609538e-06, -22, -9.616506e-07, 0, -9.616506e-07, 22, -22, -1.6609538e-06, -7.2602596e-14, 0, 0, 0)

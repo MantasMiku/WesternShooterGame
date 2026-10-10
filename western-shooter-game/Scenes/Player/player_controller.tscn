@@ -1,0 +1,276 @@
+[gd_scene format=3 uid="uid://fqo4dum6ink7"]
+
+[ext_resource type="Script" uid="uid://br26utf37mlf7" path="res://Scenes/Player/player_controller.gd" id="1_k0pio"]
+[ext_resource type="PackedScene" uid="uid://cuh0qboeuaq5x" path="res://models/pump_shotgun_long.tscn" id="2_r5hck"]
+[ext_resource type="Texture2D" uid="uid://cd18rluk47tcu" path="res://Assets/Particles/PNG (Transparent)/star_06.png" id="3_kfrkp"]
+[ext_resource type="Script" path="res://Scripts/Effects/outline.gd" id="4_outline"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_umsin"]
+resource_local_to_scene = true
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_head"]
+radius = 0.3
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_oqk7b"]
+
+[sub_resource type="Gradient" id="Gradient_kfrkp"]
+offsets = PackedFloat32Array(0, 0.17391305, 1)
+colors = PackedColorArray(0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_gym7l"]
+gradient = SubResource("Gradient_kfrkp")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_xxslp"]
+angle_min = 45.00001
+angle_max = 45.00001
+gravity = Vector3(0, 0, 0)
+color_ramp = SubResource("GradientTexture1D_gym7l")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oqk7b"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(1, 1, 0.7411765, 1)
+albedo_texture = ExtResource("3_kfrkp")
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_umsin"]
+material = SubResource("StandardMaterial3D_oqk7b")
+size = Vector2(0.5, 0.5)
+orientation = 2
+
+[sub_resource type="Animation" id="Animation_r5hck"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HeadOriginalPosition/Head/CameraSmooth/Camera3D/Pump-Shotgun-Long:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.5, -0.5, -0.5)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("HeadOriginalPosition/Head/CameraSmooth/Camera3D/Pump-Shotgun-Long:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_veqsw"]
+resource_name = "idle"
+length = 3.0000000000000004
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HeadOriginalPosition/Head/CameraSmooth/Camera3D/Pump-Shotgun-Long:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.5),
+"transitions": PackedFloat32Array(-2, -2),
+"update": 0,
+"values": [Vector3(0.5, -0.5, -0.5), Vector3(0.5, -0.53857017, -0.5)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("HeadOriginalPosition/Head/CameraSmooth/Camera3D/Pump-Shotgun-Long:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1.5),
+"transitions": PackedFloat32Array(-2, -2),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(-0.14957474, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_kfrkp"]
+resource_name = "move"
+loop_mode = 1
+step = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HeadOriginalPosition/Head/CameraSmooth/Camera3D/Pump-Shotgun-Long:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.25, 0.5, 0.75),
+"transitions": PackedFloat32Array(0.4665176, 1.7410984, 0.4665176, 1.7410984),
+"update": 0,
+"values": [Vector3(0.5, -0.5, -0.5), Vector3(0.44371736, -0.4410224, -0.5), Vector3(0.5, -0.5, -0.5), Vector3(0.5493691, -0.4471451, -0.5)]
+}
+
+[sub_resource type="Animation" id="Animation_uta3u"]
+resource_name = "reload"
+length = 0.5
+step = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HeadOriginalPosition/Head/CameraSmooth/Camera3D/Pump-Shotgun-Long:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.25, 0.5),
+"transitions": PackedFloat32Array(-2, -2, -2),
+"update": 0,
+"values": [Vector3(0.5, -0.5, -0.5), Vector3(0.5, -1.2, -0.5), Vector3(0.5, -0.5, -0.5)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = false
+tracks/1/path = NodePath("HeadOriginalPosition/Head/CameraSmooth/Camera3D/Pump-Shotgun-Long:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(-2, -2),
+"update": 0,
+"values": [Vector3(6.2831855, 0, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_gym7l"]
+resource_name = "shoot"
+length = 0.4
+step = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HeadOriginalPosition/Head/CameraSmooth/Camera3D/Pump-Shotgun-Long:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(0.5, 1),
+"update": 0,
+"values": [Vector3(0.5, -0.4, -0.3), Vector3(0.5, -0.5, -0.5)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("HeadOriginalPosition/Head/CameraSmooth/Camera3D/Pump-Shotgun-Long:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(0.5, 1),
+"update": 0,
+"values": [Vector3(0.3490659, 0, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_uta3u"]
+_data = {
+&"RESET": SubResource("Animation_r5hck"),
+&"idle": SubResource("Animation_veqsw"),
+&"move": SubResource("Animation_kfrkp"),
+&"reload": SubResource("Animation_uta3u"),
+&"shoot": SubResource("Animation_gym7l")
+}
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_kfrkp"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath("HeadOriginalPosition/Head/CameraSmooth/Camera3D:rotation")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+properties/3/path = NodePath(".:is_dead")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath(".:health")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+properties/5/path = NodePath(".:status_flags")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+
+[node name="PlayerController" type="CharacterBody3D" unique_id=1360939791]
+collision_layer = 2
+script = ExtResource("1_k0pio")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=855235097]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_umsin")
+
+[node name="WorldModel" type="Node3D" parent="." unique_id=291997348]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="WorldModel" unique_id=1173933595]
+mesh = SubResource("CapsuleMesh_oqk7b")
+
+[node name="HeadOriginalPosition" type="Node3D" parent="." unique_id=1163375596]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6000001, 0)
+
+[node name="Head" type="Node3D" parent="HeadOriginalPosition" unique_id=946855761]
+unique_name_in_owner = true
+
+[node name="HeadHitbox" type="Area3D" parent="HeadOriginalPosition/Head"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HeadOriginalPosition/Head/HeadHitbox"]
+shape = SubResource("SphereShape3D_head")
+
+[node name="CameraSmooth" type="Node3D" parent="HeadOriginalPosition/Head" unique_id=2122617965]
+unique_name_in_owner = true
+
+[node name="Camera3D" type="Camera3D" parent="HeadOriginalPosition/Head/CameraSmooth" unique_id=1627890197]
+unique_name_in_owner = true
+
+[node name="Pump-Shotgun-Long" parent="HeadOriginalPosition/Head/CameraSmooth/Camera3D" unique_id=869992579 instance=ExtResource("2_r5hck")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, -0.5, -0.5)
+
+[node name="MuzzleFlash" type="GPUParticles3D" parent="HeadOriginalPosition/Head/CameraSmooth/Camera3D/Pump-Shotgun-Long" unique_id=193946556]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.046156645, -1)
+emitting = false
+amount = 1
+lifetime = 0.25
+one_shot = true
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_xxslp")
+draw_pass_1 = SubResource("PlaneMesh_umsin")
+
+[node name="RayCast3D" type="RayCast3D" parent="HeadOriginalPosition/Head/CameraSmooth/Camera3D" unique_id=30351407]
+target_position = Vector3(0, 0, -50)
+collision_mask = 2
+
+[node name="StairsAheadRayCast3D" type="RayCast3D" parent="." unique_id=1304307754]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, -1)
+target_position = Vector3(0, -0.55, 0)
+
+[node name="StairsBelowRayCast3D" type="RayCast3D" parent="." unique_id=878616051]
+unique_name_in_owner = true
+target_position = Vector3(0, -0.75, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1591716238]
+libraries/ = SubResource("AnimationLibrary_uta3u")
+playback_default_blend_time = 0.5
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1508126956]
+replication_config = SubResource("SceneReplicationConfig_kfrkp")
+
+[node name="Outline" type="Node" parent="."]
+script = ExtResource("4_outline")
+
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://vb1fiteydc5n" path="res://models/WeaponModels/Syringe/Syringe.fbx" id="1_fbx"]
+[ext_resource type="Texture2D" path="res://models/WeaponModels/Syringe/T_Syringe_Atlas.png" id="2_atlas"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_glass"]
+resource_name = "SyringeGlass"
+transparency = 1
+cull_mode = 2
+albedo_color = Color(1, 1, 1, 0.4)
+albedo_texture = ExtResource("2_atlas")
+roughness = 0.15
+
+[node name="SyringeViewmodel" instance=ExtResource("1_fbx")]
+
+[node name="Syringe" parent="." index="0"]
+cast_shadow = 0
+surface_material_override/1 = SubResource("StandardMaterial3D_glass")

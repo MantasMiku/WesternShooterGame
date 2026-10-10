@@ -1,0 +1,219 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scenes/UI/pause_menu.gd" id="1_pause"]
+[ext_resource type="Theme" path="res://Scenes/UI/menu_theme.tres" id="2_theme"]
+
+[node name="PauseMenu" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_pause")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.03, 0.02, 0.72)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Center/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Center/Panel/VBox"]
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 46
+text = "PAUSED"
+horizontal_alignment = 1
+
+[node name="InfoLabel" type="Label" parent="Center/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.68, 0.42, 1)
+theme_override_font_sizes/font_size = 15
+text = "Death Match  |  Connected to 127.0.0.1:9999"
+horizontal_alignment = 1
+
+[node name="MainButtons" type="VBoxContainer" parent="Center/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ResumeButton" type="Button" parent="Center/Panel/VBox/MainButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Resume"
+
+[node name="OptionsButton" type="Button" parent="Center/Panel/VBox/MainButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Options"
+
+[node name="BotRow" type="HBoxContainer" parent="Center/Panel/VBox/MainButtons"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BotLabel" type="Label" parent="Center/Panel/VBox/MainButtons/BotRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Bots"
+
+[node name="RemoveBot" type="Button" parent="Center/Panel/VBox/MainButtons/BotRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(44, 0)
+layout_mode = 2
+tooltip_text = "Remove a bot"
+text = "-"
+
+[node name="BotCount" type="Label" parent="Center/Panel/VBox/MainButtons/BotRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 0)
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="AddBot" type="Button" parent="Center/Panel/VBox/MainButtons/BotRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(44, 0)
+layout_mode = 2
+tooltip_text = "Add a bot"
+text = "+"
+
+[node name="BotDifficulty" type="Button" parent="Center/Panel/VBox/MainButtons/BotRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+tooltip_text = "Bot skill - click to change"
+text = "Normal"
+
+[node name="LeaveButton" type="Button" parent="Center/Panel/VBox/MainButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.6, 0.5, 1)
+theme_override_colors/font_hover_color = Color(1, 0.7, 0.6, 1)
+text = "Disconnect"
+
+[node name="QuitButton" type="Button" parent="Center/Panel/VBox/MainButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Quit to desktop"
+
+[node name="OptionsBox" type="VBoxContainer" parent="Center/Panel/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Grid" type="GridContainer" parent="Center/Panel/VBox/OptionsBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 3
+
+[node name="SensLabel" type="Label" parent="Center/Panel/VBox/OptionsBox/Grid"]
+layout_mode = 2
+text = "Mouse sensitivity"
+
+[node name="Sensitivity" type="HSlider" parent="Center/Panel/VBox/OptionsBox/Grid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 1.0
+max_value = 15.0
+step = 0.1
+value = 5.0
+
+[node name="SensitivityValue" type="Label" parent="Center/Panel/VBox/OptionsBox/Grid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+text = "5.0"
+horizontal_alignment = 2
+
+[node name="FovLabel" type="Label" parent="Center/Panel/VBox/OptionsBox/Grid"]
+layout_mode = 2
+text = "Field of view"
+
+[node name="Fov" type="HSlider" parent="Center/Panel/VBox/OptionsBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 60.0
+max_value = 110.0
+step = 1.0
+value = 75.0
+
+[node name="FovValue" type="Label" parent="Center/Panel/VBox/OptionsBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "75"
+horizontal_alignment = 2
+
+[node name="VolumeLabel" type="Label" parent="Center/Panel/VBox/OptionsBox/Grid"]
+layout_mode = 2
+text = "Master volume"
+
+[node name="Volume" type="HSlider" parent="Center/Panel/VBox/OptionsBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+step = 1.0
+value = 80.0
+
+[node name="VolumeValue" type="Label" parent="Center/Panel/VBox/OptionsBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "80%"
+horizontal_alignment = 2
+
+[node name="FullLabel" type="Label" parent="Center/Panel/VBox/OptionsBox/Grid"]
+layout_mode = 2
+text = "Fullscreen"
+
+[node name="Fullscreen" type="Button" parent="Center/Panel/VBox/OptionsBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+toggle_mode = true
+text = "Off"
+
+[node name="Spacer" type="Control" parent="Center/Panel/VBox/OptionsBox/Grid"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="Center/Panel/VBox/OptionsBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Back"
