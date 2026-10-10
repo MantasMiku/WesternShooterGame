@@ -2,6 +2,7 @@ extends Node3D
 ## Effects on a player's body that everyone can see, driven by the player's synced status_flags:
 ##  - ON FIRE: flames + flickering orange light (Death Match underdog boost: double damage).
 ##  - HEALING: green sparkles rising (the Medic's heal-over-time / overheal).
+##  - POISONED: sickly purple bubbles drifting up and dripping off the body (Medic's dart on an enemy).
 ## Hidden from the player's own camera (like the body), so it never blocks your view.
 ##
 ## Created by player_controller.gd as a child of the player. The player's `status_flags` integer
@@ -16,6 +17,7 @@ var fire: CPUParticles3D     ## Big flame blobs around the body.
 var embers: CPUParticles3D   ## A few small, fast sparks flying higher than the flames.
 var light: OmniLight3D       ## Orange point light that lights up the surroundings while burning.
 var heal: CPUParticles3D     ## Green sparkles rising from the feet while healing.
+var poison: CPUParticles3D   ## Purple bubbles around the body while poisoned.
 var _t := 0.0                # time counter for the light flicker
 
 
@@ -35,16 +37,20 @@ func _ready() -> void:
 	heal = _make_particles(28, 1.2, [Color(0.55, 1, 0.6, 0.95), Color(0.3, 1, 0.5, 0)], 0.07, Vector3(0, 1.4, 0), 0.3, 0.8)
 	_ring(heal, 0.62, 0.1)
 	heal.position = Vector3(0, 0.15, 0)
+	# Poison: slow purple bubbles all over the body that bob up a little and then drip down.
+	poison = _make_particles(36, 1.0, [Color(0.75, 0.35, 1.0, 0.95), Color(0.45, 0.85, 0.2, 0.8), Color(0.3, 0.1, 0.4, 0.0)], 0.06, Vector3(0, -1.2, 0), 0.4, 0.9)
+	_ring(poison, 0.6, 1.6)
+	poison.position = Vector3(0, 1.0, 0)
 	light = OmniLight3D.new()
 	light.light_color = FIRE_LIGHT
 	light.omni_range = 4.0
 	light.position = Vector3(0, 1.2, 0)
 	light.visible = false
-	for n in [fire, embers, heal, light]: add_child(n)
+	for n in [fire, embers, heal, poison, light]: add_child(n)
 	set_status(0)
 
 
-## Bits: 1 = on fire, 2 = healing.
+## Bits: 1 = on fire, 2 = healing, 4 = poisoned.
 ## The flags are a bit field: several statuses fit in one int, and `flags & 1` checks just bit 1.
 ## (In GDScript `&` binds tighter than `!=`, so `flags & 1 != 0` means `(flags & 1) != 0`.)
 func set_status(flags: int) -> void:
@@ -54,13 +60,14 @@ func set_status(flags: int) -> void:
 	embers.emitting = burning
 	light.visible = burning
 	heal.emitting = flags & 2 != 0
+	poison.emitting = flags & 4 != 0
 
 
 ## Hide everything from one camera by moving it to a render layer that camera doesn't draw.
 ## The player calls this on its own (local) copy with the "own body" layer that the first-person
 ## camera excludes - other players' cameras still see the effects.
 func hide_from_layer(layer_bit: int) -> void:
-	for n in [fire, embers, heal]: n.layers = layer_bit
+	for n in [fire, embers, heal, poison]: n.layers = layer_bit
 	# Lights use a cull mask instead of layers: remove that bit so the light doesn't affect
 	# objects on that layer (e.g. your own body glowing orange right in front of the camera).
 	light.light_cull_mask &= ~layer_bit

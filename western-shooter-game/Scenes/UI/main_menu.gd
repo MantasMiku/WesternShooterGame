@@ -14,8 +14,8 @@ extends Control
 ## hands it to the level scene and swaps to it. The level then hosts or connects.
 ## Menu UI only runs on this machine.
 
-## The level scene that runs every game mode.
-const LEVEL_SCENE := "res://Levels/multiplayer_test_scene.tscn"
+## Picks the level scene for each mode (Scripts/Global/level_scenes.gd).
+const LevelScenes = preload("res://Scripts/Global/level_scenes.gd")
 ## Network settings (default port, master server URL...).
 const NetConfig = preload("res://Scripts/Network/net_config.gd")
 ## Script of the node that finds servers (we create it with .new()).
@@ -110,7 +110,11 @@ func _ready() -> void:
 	# skip the menu, the level reads the same arguments and starts the server.
 	# call_deferred: changing scene in the middle of _ready is not allowed, so do it at the end of the frame.
 	if "--server" in OS.get_cmdline_user_args():
-		get_tree().change_scene_to_file.call_deferred(LEVEL_SCENE)
+		# Load the level for the --mode=... argument (the level reads the rest of the arguments).
+		var server_mode := "team_vs_team"
+		for arg in OS.get_cmdline_user_args():
+			if arg.begins_with("--mode="): server_mode = arg.trim_prefix("--mode=")
+		get_tree().change_scene_to_file.call_deferred(LevelScenes.for_mode(server_mode))
 		return
 	# --master runs the master server (the list of online servers) instead of the game.
 	if "--master" in OS.get_cmdline_user_args():
@@ -397,7 +401,9 @@ func _start_level(as_host: bool, address := "", port := NetConfig.DEFAULT_GAME_P
 	_show_status("Creating %s..." % m.name if as_host else "Joining %s:%d..." % [address, port], false)
 	# instantiate() creates the level's nodes but does NOT add them to the tree yet,
 	# so its _ready() has not run. That gives us a chance to set start_config first.
-	var level = load(LEVEL_SCENE).instantiate()
+	# Each mode has its own level (see level_scenes.gd). When joining, a wrong guess is fixed
+	# by the level itself once the server says which mode it runs.
+	var level = load(LevelScenes.for_mode(m.id)).instantiate()
 	# Everything the level needs to know to host or join. ("class" is the level's
 	# CLASS_SCENES index, and bots only matter when hosting.)
 	level.start_config = {

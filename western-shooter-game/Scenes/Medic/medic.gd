@@ -5,7 +5,8 @@ class_name Medic
 ## - 150 HP, medium speed (from the design doc).
 ## - Weapons (see the WeaponManager node in medic.tscn):
 ##     1: Remington 1889 - 2-shell shotgun, damages enemies. R to reload.
-##     2: Syringe        - melee, heals teammates.
+##     2: Syringe        - team modes: fires healing darts at teammates (heal over time + overheal).
+##                         Death Match: heals yourself with limited doses. See syringe_weapon.gd.
 ##     3: Bone saw       - melee, damages enemies (Axe model as a placeholder).
 ##   Switch with 1 / 2 / 3 or the mouse wheel.
 ## - Passive: regenerates its own health after a few seconds without taking damage.

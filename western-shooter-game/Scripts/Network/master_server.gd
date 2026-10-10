@@ -27,8 +27,8 @@ extends Node
 ## game server (the master is never in the middle of a match).
 
 const NetConfig = preload("res://Scripts/Network/net_config.gd")
-## The level that spawned dedicated servers run.
-const LEVEL_SCENE := "res://Levels/multiplayer_test_scene.tscn"
+## Picks the level each mode runs (spawned dedicated servers open that scene).
+const LevelScenes = preload("res://Scripts/Global/level_scenes.gd")
 const STALE_SECONDS := 20.0        ## Drop servers that stop checking in.
 const SPAWN_GRACE_SECONDS := 20.0  ## How long a freshly started server has to register.
 
@@ -278,7 +278,7 @@ func _spawn_server(mode: String) -> bool:
 		args += ["--path", ProjectSettings.globalize_path("res://")]
 	# The scene to open directly, then "--" and our own options for the level's _start_dedicated_server.
 	# It reports to this master on 127.0.0.1 (same machine) and quits after idle_quit seconds empty.
-	args += [LEVEL_SCENE, "--", "--server", "--mode=" + mode, "--port=%d" % game_port,
+	args += [LevelScenes.for_mode(mode), "--", "--server", "--mode=" + mode, "--port=%d" % game_port,
 		"--master=http://127.0.0.1:%d" % port, "--quit-when-empty=%d" % idle_quit,
 		"--name=Official %s #%d" % [mode.capitalize(), _spawned.size() + 1]]
 	# create_process starts it in the background and returns its process id (pid), or -1 on failure.

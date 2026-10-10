@@ -103,8 +103,13 @@ static func spawn_effect(parent: Node, pos: Vector3, p_radius := 5.0) -> void:
 	# A static function can't use "self", so load this same script and make a new node from it.
 	var e: Node3D = load("res://Scripts/Weapons/explosion.gd").new()
 	e.radius = p_radius
+	# Place it BEFORE adding it to the tree. The particles are created in _ready (during
+	# add_child) and start emitting right away in world space - if the node were still at the
+	# world origin then, the smoke would puff up in the middle of the map instead of here.
+	# top_level = the position is in world space, whatever the parent is.
+	e.top_level = true
+	e.position = pos
 	parent.add_child(e)
-	e.global_position = pos
 	# Shake the local player's camera if they're close.
 	# Within 3 x radius: the closer you are, the stronger the shake (0.9 right next to it,
 	# 0.15 at the far edge). Only works if the current scene has a HUD with add_shake().

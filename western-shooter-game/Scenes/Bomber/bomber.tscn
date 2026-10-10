@@ -44,7 +44,7 @@ fire_cooldown = 0.65
 
 [node name="RevolverRifle" type="Node" parent="WeaponManager" node_paths=PackedStringArray("muzzle_flash", "viewmodel")]
 script = ExtResource("4_hitscan")
-damage_per_pellet = 30
+damage_per_pellet = 34
 pellet_count = 1
 spread_degrees = 0.8
 max_range = 90.0
@@ -53,8 +53,9 @@ falloff_end = 45.0
 min_damage_multiplier = 0.55
 mag_size = 6
 reserve_ammo = 36
-reload_time = 0.5
+reload_time = 0.35
 reload_per_round = true
+empty_reload_commit = 3
 muzzle_flash = NodePath("../../HeadOriginalPosition/Head/CameraSmooth/Camera3D/RevolverRifleViewmodel/MuzzleFlash")
 recoil_kick = 0.07
 recoil_pitch_degrees = 7.0

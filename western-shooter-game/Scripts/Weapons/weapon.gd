@@ -52,6 +52,11 @@ var _cooldown := 0.0
 var _rest_transform := Transform3D()   ## Viewmodel's resting pose (visual tweens return here).
 ## The animation currently moving the viewmodel. Kept so a new animation can stop the old one.
 var _tween: Tween
+## A click that came a moment before the weapon was ready (see FIRE_BUFFER).
+var _queued_fire := false
+## Clicking up to this many seconds before the cooldown ends still fires - as soon as it's ready.
+## Makes spam-clicking fast guns feel reliable instead of eating clicks that are slightly early.
+const FIRE_BUFFER := 0.12
 
 
 ## Called once by the WeaponManager in its _ready(), on every peer.
@@ -68,6 +73,12 @@ func setup(p_player: CharacterBody3D, p_manager: Node) -> void:
 ## always calling super(delta) first so the cooldown keeps counting down.
 func tick(delta: float) -> void:
 	_cooldown = maxf(_cooldown - delta, 0.0)
+	# A buffered early click: fire now that the cooldown is over (if still allowed).
+	if _queued_fire and _cooldown <= 0.0:
+		_queued_fire = false
+		if manager and manager.get_current_weapon() == self and !player.is_dead and !player.frozen and can_fire():
+			_cooldown = fire_cooldown
+			_fire()
 
 
 ## True when the weapon is allowed to attack right now. Subclasses add extra rules
@@ -79,7 +90,10 @@ func can_fire() -> bool:
 ## Called by the WeaponManager during _physics_process (so physics queries are safe).
 ## Checks the cooldown, restarts it, then lets the subclass do the actual attack.
 func try_fire() -> void:
-	if !can_fire(): return
+	if !can_fire():
+		# Clicked just a little too early: remember it and fire the moment the cooldown ends.
+		if _cooldown > 0.0 and _cooldown <= FIRE_BUFFER: _queued_fire = true
+		return
 	_cooldown = fire_cooldown
 	_fire()
 
@@ -98,6 +112,7 @@ func try_reload() -> void:
 ## Back to a fresh state (called when the player respawns). Override for ammo etc.
 func reset() -> void:
 	_cooldown = 0.0
+	_queued_fire = false
 	_reset_viewmodel()
 
 
@@ -148,6 +163,7 @@ func equip() -> void:
 
 ## Called (on every peer) when the player switches AWAY from this weapon: hide the model.
 func unequip() -> void:
+	_queued_fire = false
 	_reset_viewmodel()
 	if viewmodel: viewmodel.visible = false
 

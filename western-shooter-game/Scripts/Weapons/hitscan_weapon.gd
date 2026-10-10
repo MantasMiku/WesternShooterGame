@@ -35,6 +35,17 @@ extends "res://Scripts/Weapons/weapon.gd"
 ## (shotguns are set to 1 so a point-blank face shot isn't an instant kill).
 @export var headshot_multiplier := 2.0
 
+@export_group("Spread bloom")
+## Each shot widens the spread by this many degrees (0 = no bloom, every shot equally accurate).
+## Firing fast makes the gun less accurate; pausing lets it settle again.
+@export var spread_per_shot := 0.0
+## The bloom never adds more than this many degrees on top of spread_degrees.
+@export var max_extra_spread := 0.0
+## Degrees of bloom recovered per second once you stop firing...
+@export var spread_recovery := 8.0
+## ...after this many seconds without a shot.
+@export var spread_recovery_delay := 0.12
+
 @export_group("Ammo")
 ## Rounds the gun holds before it must reload.
 @export var mag_size := 2
@@ -43,6 +54,10 @@ extends "res://Scripts/Weapons/weapon.gd"
 ## Tube-fed guns (lever rifles, pump shotguns): load one round at a time, every `reload_time`
 ## seconds. Firing interrupts the reload if at least one round is loaded.
 @export var reload_per_round := false
+## Per-round guns: after you EMPTY the gun, the reload can only be interrupted by shooting once
+## this many rounds are back in. Stops mashing fire from looping "load 1, shoot 1" forever.
+## (A reload you start yourself with rounds still loaded can be interrupted any time.)
+@export var empty_reload_commit := 1
 @export var auto_reload := true          ## This gun may auto reload (the player's "Auto reload" option must be on too).
 ## Auto reload: tops the magazine up after this many seconds without shooting (and right away when empty).
 @export var idle_reload_delay := 0.8
@@ -68,12 +83,16 @@ var ammo := 0
 var reserve := 0
 ## True while a reload is running (the gun can't fire unless the reload is interrupted).
 var _reloading := false
+## True if the current reload started with an empty gun (see empty_reload_commit).
+var _reload_from_empty := false
 ## Seconds until the current reload (or the current round, for per-round guns) finishes.
 var _reload_timer := 0.0
 ## Seconds since the last shot (for the idle auto reload).
 var _since_shot := 0.0
 ## Seconds this gun has been put away (for the holster reload).
 var _holstered_for := 0.0
+## Extra spread (degrees) built up by firing quickly (see "Spread bloom").
+var _bloom := 0.0
 
 
 ## Start with a full magazine and full spare ammo.
@@ -87,6 +106,9 @@ func _ready() -> void:
 func tick(delta: float) -> void:
 	super(delta)
 	_since_shot += delta
+	# Bloom settles back down once you stop shooting for a moment.
+	if _bloom > 0.0 and _since_shot >= spread_recovery_delay:
+		_bloom = maxf(_bloom - spread_recovery * delta, 0.0)
 	if manager.get_current_weapon() != self:
 		# Holstered: reload in the background.
 		# Once it has been away for holster_reload_seconds, move rounds from the reserve into
@@ -131,7 +153,9 @@ func try_fire() -> void:
 	if ammo <= 0 and !_reloading:
 		try_reload()
 		return
-	if _reloading and ammo > 0 and _cooldown <= 0.0:
+	# An empty gun has to load at least empty_reload_commit rounds before shooting can cut in.
+	var committed := _reload_from_empty and ammo < empty_reload_commit
+	if _reloading and ammo > 0 and _cooldown <= 0.0 and !committed:
 		# Shooting interrupts a reload if there's anything loaded (shell-by-shell guns keep
 		# what they've loaded so far; others just stop reloading).
 		_reloading = false
@@ -154,7 +178,9 @@ func _fire() -> void:
 	# The camera's basis holds its three direction vectors: -z = forward (where the
 	# crosshair points), x = right, y = up.
 	var basis := cam.global_basis
-	var spread := deg_to_rad(spread_degrees)
+	# Current accuracy = base spread + bloom from the shots just before this one.
+	var spread := deg_to_rad(spread_degrees + _bloom)
+	_bloom = minf(_bloom + spread_per_shot, max_extra_spread)
 	var damage_by_target := {}
 	var hit_points := {}   # target -> list of hit positions (averaged for the damage number position)
 	var headshot_targets := {}
@@ -267,6 +293,7 @@ func _show_tracers(ends: PackedVector3Array, world_hits: PackedByteArray) -> voi
 func try_reload() -> void:
 	if _reloading or ammo >= mag_size or reserve <= 0: return
 	_reloading = true
+	_reload_from_empty = ammo == 0
 	_reload_timer = reload_time
 	status_changed.emit()
 	manager.broadcast_reload_visual(self)
@@ -312,6 +339,7 @@ func add_ammo_fraction(fraction: float) -> void:
 func reset() -> void:
 	super()
 	_reloading = false
+	_bloom = 0.0
 	ammo = mag_size
 	reserve = reserve_ammo
 	status_changed.emit()

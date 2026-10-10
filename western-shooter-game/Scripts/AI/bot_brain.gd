@@ -116,7 +116,9 @@ func _physics_process(delta: float) -> void:
 		_fight(delta)
 	else:
 		_seen_for = 0.0
-		_roam(delta)
+		# Medic bots in team modes: heal a hurt teammate in sight before wandering off.
+		if !_heal_teammate(delta):
+			_roam(delta)
 	_check_stuck(delta)
 
 
@@ -221,7 +223,7 @@ func _pick_weapon(wm, weapon, dist := 10.0) -> void:
 	if wm == null or weapon == null: return
 	# Hurt and carrying a self-heal (Medic's syringe in Death Match)? Use it.
 	# A "non-attack" weapon that can fire is a self-use item such as the syringe.
-	var heal_i := _find_weapon(wm, func(w): return !_is_attack(w) and w.can_fire())
+	var heal_i := _find_weapon(wm, func(w): return w.has_method("is_self_use") and w.is_self_use() and w.can_fire())
 	if heal_i >= 0 and player.health < player.max_health * 0.6 and player.get_heal_time_left() <= 0.0:
 		# First frame: switch to it. Next frames (once it's in hand): use it.
 		if wm.current_index != heal_i: wm.select_weapon(heal_i)
@@ -258,10 +260,65 @@ func _pick_weapon(wm, weapon, dist := 10.0) -> void:
 	if want >= 0: wm.select_weapon(want)
 
 
-## Weapons used on yourself (not for attacking).
-## Returns true for normal attack weapons, false for self-use items (e.g. the Medic's syringe).
+## Returns true for normal attack weapons, false for healing items (the Medic's syringe, which
+## heals yourself in Death Match and fires healing darts at teammates in team modes).
 func _is_attack(w) -> bool:
-	return !(w.has_method("is_self_use") and w.is_self_use())
+	return !w.has_method("is_self_use")
+
+
+# --- Healing teammates (Medic bots in team modes) -----------------------------------------
+
+## The teammate we are currently trying to heal (null = none).
+var _heal_mate: Node3D = null
+
+## Medic bot with healing darts: picks a hurt teammate it can see, turns to them, walks closer
+## if they're far, and fires darts. Returns false when there is nobody to heal (or no darts),
+## so the caller roams instead.
+func _heal_teammate(delta: float) -> bool:
+	var wm = player.weapon_manager
+	if wm == null: return false
+	# A dart syringe with darts loaded or spares to reload (clicking it empty starts the reload).
+	var i := _find_weapon(wm, func(w): return w.has_method("bot_dart_lift") and !w.is_self_use() and (w.ammo > 0 or w.reserve > 0))
+	if i < 0: return false
+	# Re-pick the teammate on the same 4-times-a-second "think" as targets (cheap raycasts).
+	if _think_left >= 0.24 or _heal_mate == null or !is_instance_valid(_heal_mate) or !_needs_heal(_heal_mate):
+		_heal_mate = _find_hurt_teammate()
+	if _heal_mate == null: return false
+	if wm.current_index != i:
+		wm.select_weapon(i)
+		return true
+	var dart = wm.weapons[i]
+	var dist := player.global_position.distance_to(_heal_mate.global_position)
+	# Aim at the chest, raised by the dart's drop over that distance.
+	var aim_point: Vector3 = _heal_mate.global_position + Vector3.UP * (1.1 + float(dart.bot_dart_lift(dist)))
+	_look_at(aim_point, delta)
+	# Walk toward them if far, otherwise stand and shoot.
+	player.bot_move = Vector2(0, -1) if dist > 18.0 else Vector2.ZERO
+	player.bot_sprint = dist > 25.0
+	var forward: Vector3 = -player.camera.global_basis.z
+	var to_mate: Vector3 = (aim_point - player.camera.global_position).normalized()
+	if rad_to_deg(forward.angle_to(to_mate)) <= 4.0 and (dart.can_fire() or dart.ammo == 0):
+		wm.try_primary_fire()   # with an empty syringe this starts a reload, like a player clicking
+	return true
+
+
+## True if this teammate is alive, hurt, and not already being healed (the green sparkles flag
+## is synced to every peer, so this works for human teammates on other computers too).
+func _needs_heal(p) -> bool:
+	return !p.is_dead and p.health < p.max_health and (p.status_flags & p.STATUS_HEALING) == 0
+
+
+## The closest hurt teammate within 35 m that we can see, or null.
+func _find_hurt_teammate() -> Node3D:
+	var best: Node3D = null
+	var best_dist := 35.0
+	for p in level._players():
+		if p == player or !player.is_teammate(p) or !_needs_heal(p): continue
+		var d: float = player.global_position.distance_to(p.global_position)
+		if d < best_dist and _can_see(p):
+			best_dist = d
+			best = p
+	return best
 
 
 ## How many pellets one shot fires (shotguns > 1). Weapons without the property count as 1.

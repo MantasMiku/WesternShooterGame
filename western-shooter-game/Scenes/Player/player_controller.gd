@@ -106,10 +106,12 @@ var start_dead_for := 0.0
 
 # --- Visible status effects ----------------------------------------------------------------
 
-## Visible states other players should see (synced): STATUS_FIRE = boosted, STATUS_HEALING.
+## Visible states other players should see (synced): STATUS_FIRE = boosted, STATUS_HEALING,
+## STATUS_POISON (hit by an enemy Medic's dart).
 ## They are bit flags, so both can be on at once: flags |= X turns X on, flags &= ~X turns it off.
 const STATUS_FIRE := 1
 const STATUS_HEALING := 2
+const STATUS_POISON := 4
 ## Which status effects are active (bit flags above). Synced to everyone "on change" by the
 ## MultiplayerSynchronizer; the setter updates the visible effect on every peer.
 var status_flags := 0: set = _set_status_flags
@@ -130,6 +132,16 @@ var _hot_cap := 0        # highest health the current HoT may heal up to
 # fractions are collected here and only whole points are added to health.
 var _hot_accum := 0.0
 var _decay_accum := 0.0  # same idea for the overheal drain
+
+# --- Poison (damage over time) -------------------------------------------------------------
+
+## Poison: the reverse of the heal over time (the Medic's darts hitting an enemy). Damage is
+## spread over a few seconds and counts as the poisoner's hit, so a poison kill is their kill.
+var _poison_rate := 0.0      # damage per second
+var _poison_left := 0.0      # seconds
+var _poison_accum := 0.0     # fractions of damage collected until there is a whole point
+var _poison_attacker := 0    # combat_id of whoever poisoned us (gets the kill)
+var _poison_weapon := ""     # weapon name for the kill feed / kill cam
 
 ## Render layer used only to hide your own body from your own camera (layer 20, chosen to stay out of your way).
 ## 1 << 19 means "bit number 19" = render layer 20 in the editor (the editor counts from 1).
@@ -732,6 +744,7 @@ func _die(killer_id: int) -> void:
 	_respawn_left = respawn_delay
 	_end_boost()
 	_end_heal_over_time()
+	_end_poison()
 	died.emit(killer_id)
 
 
@@ -745,6 +758,7 @@ func respawn() -> void:
 	_fall_safe_until = Time.get_ticks_msec() / 1000.0 + 0.5   # half a second of fall-kill immunity
 	is_dead = false
 	_end_heal_over_time()
+	_end_poison()
 	_last_attacker = 0
 	health = max_health
 	velocity = Vector3.ZERO
@@ -765,6 +779,7 @@ func _tick_timers(delta: float) -> void:
 		if _boost_left <= 0.0:
 			_end_boost()
 	_tick_heal_over_time(delta)
+	_tick_poison(delta)
 
 
 # --- Controls: keyboard for people, bot brain for bots -----------------------------------------
@@ -860,6 +875,50 @@ func receive_ammo(fraction: float) -> void:
 @rpc("any_peer", "call_local")
 func receive_heal(amount: int) -> void:
 	heal(amount)
+
+## Runs on the poisoned player's own peer: take `total` damage spread over `seconds`
+## (the Medic's darts hitting an enemy). Send with
+## receive_poison.rpc_id(target.get_multiplayer_authority(), total, seconds, attacker_id, weapon).
+@rpc("any_peer", "call_local", "reliable")
+func receive_poison(total: float, seconds: float, attacker_id: int, weapon := "") -> void:
+	if is_dead: return
+	# Stacks like the heal over time: damage still to come + the new dose, over the longer time.
+	var remaining := _poison_rate * _poison_left + total
+	_poison_left = maxf(_poison_left, seconds)
+	_poison_rate = remaining / _poison_left
+	_poison_attacker = attacker_id
+	_poison_weapon = weapon
+	status_flags |= STATUS_POISON   # show the poison effect to everyone
+
+
+## Every physics frame: deal the poison damage in whole points.
+func _tick_poison(delta: float) -> void:
+	if is_dead or _poison_left <= 0.0: return
+	_poison_left -= delta
+	_poison_accum += _poison_rate * delta
+	var whole := floori(_poison_accum)
+	if whole > 0:
+		_poison_accum -= whole
+		# Called directly (not as an RPC): we are already on our own peer.
+		receive_damage(whole, _poison_attacker, _poison_weapon)
+	if _poison_left <= 0.0: _end_poison()
+
+
+## Stops the poison (worn off, died or respawned).
+func _end_poison() -> void:
+	_poison_left = 0.0
+	_poison_rate = 0.0
+	_poison_accum = 0.0
+	status_flags &= ~STATUS_POISON
+
+
+## Runs on the healed player's own peer: start a heal over time (the Medic's healing darts).
+## `cap` allows overheal (e.g. 1.5 x max health). Send with
+## receive_heal_over_time.rpc_id(target.get_multiplayer_authority(), total, seconds, cap).
+## "reliable" so a heal is never lost on the way.
+@rpc("any_peer", "call_local", "reliable")
+func receive_heal_over_time(total: float, seconds: float, cap: int) -> void:
+	add_heal_over_time(total, seconds, cap)
 
 ## Weapons call this after a hit so the HUD can show hitmarkers / damage numbers.
 func report_damage_dealt(amount: int, world_position: Vector3, is_heal := false, is_headshot := false) -> void:

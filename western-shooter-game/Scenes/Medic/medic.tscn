@@ -37,6 +37,10 @@ script = ExtResource("3_wm")
 
 [node name="Shotgun" type="Node" parent="WeaponManager" index="0" unique_id=39801721 node_paths=PackedStringArray("muzzle_flash", "viewmodel")]
 script = ExtResource("4_hitscan")
+reload_time = 1.8
+min_damage_multiplier = 0.35
+falloff_end = 25.0
+spread_degrees = 4.0
 headshot_multiplier = 1.0
 view_punch_degrees = 2.5
 muzzle_flash = NodePath("../../HeadOriginalPosition/Head/CameraSmooth/Camera3D/HunterShotgunViewmodel/MuzzleFlash")
@@ -53,6 +57,7 @@ fire_cooldown = 0.6
 
 [node name="BoneSaw" type="Node" parent="WeaponManager" index="2" unique_id=1755793760 node_paths=PackedStringArray("viewmodel")]
 script = ExtResource("7_melee")
+damage = 50
 swing_time = 0.35
 weapon_name = "Bone Saw"
 viewmodel = NodePath("../../HeadOriginalPosition/Head/CameraSmooth/Camera3D/BoneSawViewmodel")

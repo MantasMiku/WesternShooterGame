@@ -21,6 +21,8 @@ extends Control
 ## - Hitting someone: crosshair hitmarker + floating damage numbers (green "+X" for heals).
 ## - Overheal (health above max): the health number turns light blue.
 ## - It also creates the kill cam (kill_cam.gd) from code as a child.
+## - And the teammate health display (teammate_health.gd): aim at a teammate to see their HP;
+##   Medics also see a red cross over every badly hurt teammate.
 
 # --- Colours -------------------------------------------------------------------
 # Kept as constants in one place so the whole HUD uses a consistent palette.
@@ -81,6 +83,8 @@ const COLOR_OVERHEAL := Color(0.55, 0.85, 1.0)
 ## The local player this HUD is showing (set in bind_player).
 var player: Node3D
 var kill_cam: Control   ## Scenes/UI/kill_cam.gd - shows who killed you.
+## Scenes/UI/teammate_health.gd - teammate HP under the crosshair, Medic's critical-health markers.
+var teammate_health: Control
 ## Health we are currently displaying (used to tell hits from heals).
 var _health := 0
 ## The player's max health (for bar range, overheal and low-health checks).
@@ -112,6 +116,10 @@ func _ready() -> void:
 	hurt_vignette.material = hurt_vignette.material.duplicate()
 	heal_vignette.material = heal_vignette.material.duplicate()
 	ammo_panel.hide()
+	# Teammate health display (pure code too). Added before the kill cam so the kill cam draws on top.
+	teammate_health = preload("res://Scenes/UI/teammate_health.gd").new()
+	teammate_health.name = "TeammateHealth"
+	add_child(teammate_health)
 	# The kill cam is pure code (no .tscn), so we create it with .new() and add it as a child.
 	kill_cam = preload("res://Scenes/UI/kill_cam.gd").new()
 	kill_cam.name = "KillCam"
@@ -123,6 +131,7 @@ func _ready() -> void:
 func bind_player(p: Node3D) -> void:
 	player = p
 	kill_cam.bind_player(p)
+	teammate_health.bind_player(p)
 	# Signal-driven UI: instead of checking the player every frame, we get told when things change.
 	p.health_changed.connect(_on_health_changed)
 	p.damage_taken.connect(_on_damage_taken)

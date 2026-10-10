@@ -54,8 +54,14 @@ const MAIN_MENU_SCENE := "res://Scenes/UI/main_menu.tscn"
 # Helper scripts loaded as constants so we can call their static functions / create them with .new().
 const NetConfig = preload("res://Scripts/Network/net_config.gd")
 const ServerQuery = preload("res://Scripts/Network/server_query.gd")
-## Map name shown in the server browser.
-const MAP_NAME := "Test Arena"
+## Picks the level scene for each mode (Scripts/Global/level_scenes.gd).
+const LevelScenes = preload("res://Scripts/Global/level_scenes.gd")
+
+## Map name shown in the server browser. Set it per level scene in the Inspector (root node).
+@export var map_name := "Test Arena"
+## Mode used by the old in-scene Host button, i.e. when you press F6 on this level in the editor.
+## (Games started from the main menu or a dedicated server use their own mode instead.)
+@export_enum("team_vs_team", "deathmatch", "wave_survival") var direct_run_mode := "team_vs_team"
 const GameSettings = preload("res://Scripts/Global/game_settings.gd")
 ## Modes with rules. Each is a node added to the level (same name on every peer so RPCs line up).
 ## (An RPC is sent to "the node at this path" on the other computer, so the game mode node must
@@ -278,7 +284,7 @@ func _start_dedicated_server(args: Dictionary) -> void:
 # Old in-scene menu (when this scene is run directly).
 # These are connected to the Host/Join buttons in the .tscn file.
 func _on_host_button_pressed() -> void:
-	host_game("team_vs_team", classSelect.selected, teamSelect.selected)
+	host_game(direct_run_mode, classSelect.selected, teamSelect.selected)
 
 func _on_join_button_pressed() -> void:
 	join_game(addressEntry.text, classSelect.selected, teamSelect.selected)
@@ -308,10 +314,36 @@ func _on_peer_connected(id: int) -> void:
 @rpc("authority", "reliable")
 func _receive_mode(p_mode: String, p_sub_mode: String) -> void:
 	mode = p_mode if MODES.has(p_mode) else "team_vs_team"
+	# Each mode can have its own level scene. If we joined with the wrong one (e.g. Direct
+	# Connect with a different mode card selected), load the right level and join again.
+	var wanted := LevelScenes.for_mode(mode)
+	if scene_file_path != "" and wanted != scene_file_path:
+		_rejoin_in_level.call_deferred(wanted)
+		return
 	sub_mode = p_sub_mode
 	_ensure_game_mode()
 	# Now we're ready: ask the server (always peer 1) to spawn us with what we picked in the menu.
 	request_spawn.rpc_id(1, _local_class, _local_team, _local_name)
+
+
+# Client: leave this level and join the same server again from the level scene at `path`.
+# Deferred from _receive_mode, so we don't free the level in the middle of an RPC.
+func _rejoin_in_level(path: String) -> void:
+	# Stop listening first, so closing the connection doesn't send us back to the main menu.
+	multiplayer.server_disconnected.disconnect(_on_server_disconnected)
+	multiplayer.connection_failed.disconnect(_on_connection_failed)
+	enet_peer.close()
+	multiplayer.multiplayer_peer = null
+	var level = load(path).instantiate()
+	level.start_config = {
+		"host": false, "mode": mode, "class": _local_class, "team": _local_team,
+		"address": _address, "port": _join_port, "name": _local_name,
+	}
+	# Same scene swap as the main menu: add the new level, make it current, delete this one.
+	var tree := get_tree()
+	tree.root.add_child(level)
+	tree.current_scene = level
+	queue_free()
 
 
 # Client -> server: "spawn me as this class on this team".
@@ -354,7 +386,9 @@ func add_player(peer_id: int, class_index: int, team: int, player_name := "Playe
 			spawn_pos = _random_ffa_spawn()
 		"coop":
 			team = 0
-			spawn_pos = _team_spawn(0)
+			# Co-op levels use SpawnPoints/Players; older levels fall back to the Red spawns.
+			var coop_points := get_spawn_points("Players")
+			spawn_pos = coop_points.pick_random() if !coop_points.is_empty() else _team_spawn(0)
 		_:
 			if team < 0 or team >= TEAM_NAMES.size():
 				team = _smaller_team()   # "Auto" (Quick Play / browser joins)
@@ -718,7 +752,7 @@ func _start_server_services(port: int) -> void:
 func _server_info() -> Dictionary:
 	return {
 		v = NetConfig.PROTOCOL_VERSION, id = _server_id, name = server_name, mode = mode, sub_mode = sub_mode,
-		map = MAP_NAME, players = _players().size(), max_players = MODES[mode].max_players,
+		map = map_name, players = _players().size(), max_players = MODES[mode].max_players,
 		port = _server_port, dedicated = is_dedicated_server,
 	}
 

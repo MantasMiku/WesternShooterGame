@@ -87,8 +87,12 @@ func _ready() -> void:
 		pm.albedo_color = Color(0.75, 0.68, 0.55)
 		m.material = pm
 		puff.mesh = m
+		# Off until it's in place (a new emitter starts on its own, and the tracer node sits at the
+		# world origin, so it would first puff there). This node is top_level at the origin, so a
+		# local position is the same as a world position.
+		puff.emitting = false
+		puff.position = to
 		add_child(puff)
-		puff.global_position = to
 		puff.emitting = true
 
 	# Delete the whole tracer (streak + puff) after 0.5 s - long enough for both to finish.

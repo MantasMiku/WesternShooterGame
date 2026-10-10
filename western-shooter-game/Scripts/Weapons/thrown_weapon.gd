@@ -102,10 +102,12 @@ func _spawn_projectile(id: int, start: Vector3, vel: Vector3) -> void:
 	p.fuse = fuse_time
 	# True only on the thrower's peer: that copy decides when to explode.
 	p.is_owner_copy = is_multiplayer_authority()
-	add_child(p)   # this weapon is a plain Node, so the stick flies freely in world space
-	p.global_position = start
+	# Place and point it BEFORE add_child: its fuse sparks start in _ready, and at the world
+	# origin they would leave a puff in the middle of the map. (The parent is a plain Node, so
+	# the transform set here is already in world space.)
 	# Point the stick along its flight direction (Basis.looking_at needs a non-zero direction).
-	p.global_basis = Basis.looking_at(vel.normalized()) if vel.length() > 0.1 else Basis()
+	p.transform = Transform3D(Basis.looking_at(vel.normalized()) if vel.length() > 0.1 else Basis(), start)
+	add_child(p)   # this weapon is a plain Node, so the stick flies freely in world space
 	p.linear_velocity = vel
 	# Spin: tumble end over end around its own x axis, plus a little random wobble.
 	p.angular_velocity = p.global_basis.x * -9.0 + Vector3(randf_range(-2, 2), randf_range(-2, 2), randf_range(-2, 2))

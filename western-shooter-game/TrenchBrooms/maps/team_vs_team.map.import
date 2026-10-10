@@ -1,0 +1,14 @@
+[remap]
+
+importer="func_godot.map"
+type="Resource"
+uid="uid://d13pstjgymb8w"
+path="res://.godot/imported/team_vs_team.map-18f7d510e617b8508b11e9354465ab99.tres"
+
+[deps]
+
+source_file="res://TrenchBrooms/maps/team_vs_team.map"
+dest_files=["res://.godot/imported/team_vs_team.map-18f7d510e617b8508b11e9354465ab99.tres"]
+
+[params]
+
