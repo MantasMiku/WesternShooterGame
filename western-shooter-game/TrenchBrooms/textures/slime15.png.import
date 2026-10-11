@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://i11gbl6kintf"
 path.s3tc="res://.godot/imported/slime15.png-c1186f4ef06b5a2c2bae58d9d30eb9dd.s3tc.ctex"
+path.etc2="res://.godot/imported/slime15.png-c1186f4ef06b5a2c2bae58d9d30eb9dd.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://TrenchBrooms/textures/slime15.png"
-dest_files=["res://.godot/imported/slime15.png-c1186f4ef06b5a2c2bae58d9d30eb9dd.s3tc.ctex"]
+dest_files=["res://.godot/imported/slime15.png-c1186f4ef06b5a2c2bae58d9d30eb9dd.s3tc.ctex", "res://.godot/imported/slime15.png-c1186f4ef06b5a2c2bae58d9d30eb9dd.etc2.ctex"]
 
 [params]
 

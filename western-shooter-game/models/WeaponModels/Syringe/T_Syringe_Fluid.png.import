@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://bgc2mnkkmlojb"
 path.s3tc="res://.godot/imported/T_Syringe_Fluid.png-b58d7b9a6ef2ddfa76d022822439317c.s3tc.ctex"
+path.etc2="res://.godot/imported/T_Syringe_Fluid.png-b58d7b9a6ef2ddfa76d022822439317c.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://models/WeaponModels/Syringe/T_Syringe_Fluid.png"
-dest_files=["res://.godot/imported/T_Syringe_Fluid.png-b58d7b9a6ef2ddfa76d022822439317c.s3tc.ctex"]
+dest_files=["res://.godot/imported/T_Syringe_Fluid.png-b58d7b9a6ef2ddfa76d022822439317c.s3tc.ctex", "res://.godot/imported/T_Syringe_Fluid.png-b58d7b9a6ef2ddfa76d022822439317c.etc2.ctex"]
 
 [params]
 

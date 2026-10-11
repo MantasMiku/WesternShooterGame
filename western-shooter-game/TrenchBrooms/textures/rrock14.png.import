@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://6g2u5hphn6ic"
 path.s3tc="res://.godot/imported/rrock14.png-e38126fb5a51813cbe346835eb5c64ba.s3tc.ctex"
+path.etc2="res://.godot/imported/rrock14.png-e38126fb5a51813cbe346835eb5c64ba.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://TrenchBrooms/textures/rrock14.png"
-dest_files=["res://.godot/imported/rrock14.png-e38126fb5a51813cbe346835eb5c64ba.s3tc.ctex"]
+dest_files=["res://.godot/imported/rrock14.png-e38126fb5a51813cbe346835eb5c64ba.s3tc.ctex", "res://.godot/imported/rrock14.png-e38126fb5a51813cbe346835eb5c64ba.etc2.ctex"]
 
 [params]
 
